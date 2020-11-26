@@ -6,7 +6,7 @@ cache
 artifacts
 
 #Typechain
-types
+/types
 
 #Coverage
 coverage
