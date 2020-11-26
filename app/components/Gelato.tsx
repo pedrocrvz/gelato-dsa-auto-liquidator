@@ -354,7 +354,7 @@ const Gelato: FC<{ dsaBalance: string; mutateDsaBalance(): Promise<string> }> = 
                           </TableRow>
                           <TableRow>
                             <TableCell>
-                              ETH used to pay flashloan of
+                              ETH used to pay flashloan of{' '}
                               {initialDebt ? ethers.utils.formatUnits(initialDebt, 18) : '0'} DAI
                             </TableCell>
                             <TableCell>
