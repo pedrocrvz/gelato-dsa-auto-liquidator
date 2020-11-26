@@ -1,0 +1,43 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "getTokenLimit",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "dydx",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maker",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "compound",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "aave",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IInstaPoolResolver.RouteData",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
