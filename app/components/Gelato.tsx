@@ -61,7 +61,7 @@ const updateMockPrice = async (signer: any, price: string) => {
   await tx.wait()
 }
 
-const Gelato: FC<{ dsaBalance: string }> = ({ dsaBalance }) => {
+const Gelato: FC<{ dsaBalance: string; mutateDsaBalance(): Promise<string> }> = ({ dsaBalance, mutateDsaBalance }) => {
   const classes = useStyles()
 
   const { gelatoExecutor, gelatoProvider, address: userAddress, signer: user, masterSigner } = useSigner()
@@ -148,6 +148,7 @@ const Gelato: FC<{ dsaBalance: string }> = ({ dsaBalance }) => {
           gasLimit: GAS_LIMIT,
         })
         tx.wait()
+        await mutateDsaBalance()
         updateSharedState({ taskExecuted: true })
       } catch (error) {
         console.log('error simulating auto liq: ', error)
@@ -193,6 +194,7 @@ const Gelato: FC<{ dsaBalance: string }> = ({ dsaBalance }) => {
       await updateMockPrice(user, newMockPrice)
       updateSharedState({ mockedPrice: newMockPrice })
       await mutateCanExec()
+      // eslint-disable-next-line no-empty
     } catch (error) {}
 
     if (!mockPriceExecuted) updateSharedState({ mockPriceExecuted: true })
@@ -352,8 +354,8 @@ const Gelato: FC<{ dsaBalance: string }> = ({ dsaBalance }) => {
                           </TableRow>
                           <TableRow>
                             <TableCell>
-                              ETH used to pay flashloan of{' '}
-                              {initialDebt ? ethers.utils.formatUnits(initialDebt, 18) : '0'}
+                              ETH used to pay flashloan of
+                              {initialDebt ? ethers.utils.formatUnits(initialDebt, 18) : '0'} DAI
                             </TableCell>
                             <TableCell>
                               <Typography variant="body2" color="textSecondary">

@@ -114,10 +114,13 @@ const IndexPage: FC = () => {
     getUniswapPrices,
   )
   const { data: balance, mutate: mutateUserBalance } = useSWR(
-    signer ? [provider, address, , 'getUserBalance'] : null,
+    signer ? [provider, address, 'getUserBalance'] : null,
     getBalance,
   )
-  const { data: dsaBalance } = useSWR(dsaIsCreated ? [provider, dsaAddress, 'getDsaBalance'] : null, getDsaBalance)
+  const { data: dsaBalance, mutate: mutateDsaBalance } = useSWR(
+    dsaIsCreated ? [provider, dsaAddress, 'getDsaBalance'] : null,
+    getDsaBalance,
+  )
 
   useEffect(() => {
     const getBlock = async () => {
@@ -220,7 +223,7 @@ const IndexPage: FC = () => {
                   style={{ float: 'right' }}
                   onClick={() => {
                     resetSharedState()
-                    //location.reload()
+                    location.reload()
                   }}
                   size="large"
                 >
@@ -272,7 +275,7 @@ const IndexPage: FC = () => {
                   <Box>
                     {currentTab === 'dsa' && <DSAModeration />}
                     {currentTab === 'vault' && <Vault />}
-                    {currentTab === 'gelato' && <Gelato dsaBalance={dsaBalance} />}
+                    {currentTab === 'gelato' && <Gelato dsaBalance={dsaBalance} mutateDsaBalance={mutateDsaBalance} />}
                   </Box>
                 </>
               ) : (
