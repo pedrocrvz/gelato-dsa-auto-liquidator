@@ -1,4 +1,4 @@
-export const getAutoLiquidationGasCostByRoute = async (route: number, colToken: string): number => {
+export const getAutoLiquidationGasCostByRoute = (route: number, colToken: string): number => {
   let gasUsed = 0
 
   // 1148384 + 1M
