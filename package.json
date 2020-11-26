@@ -62,6 +62,6 @@
   "lint-staged": {
     "*.{sol}": "npm run lint:sol",
     "*.{ts,js}": "npm run lint:ts",
-    "*.{ts,js,json, sol}": "npm run prettier"
+    "*.{ts,js,json,sol}": "npm run prettier"
   }
 }
