@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "../../interfaces/InstaDapp/resolvers/IInstaPoolResolver.sol";
 import { add, sub, wmul, wdiv } from "../../math/DSMath.sol";
+import "../../utils/SafeMath.sol";
 import { INSTA_POOL_RESOLVER, ETH } from "../../constants/CInstaDapp.sol";
 import { GAS_CONSUMED_FOR_AUTO_LIQUIDATION } from "../../constants/CAutoLiquidation.sol";
 
@@ -27,4 +28,8 @@ function _getGasConsumedAutoLiquidation(uint256 _route, address colToken) pure r
 
 function _checkRouteIndex(uint256 _route) pure {
     require(_route <= 4, "FGelatoDebtBridge._getGasCostMakerToMaker: invalid route index");
+}
+
+function _convertTo18(uint256 _dec, uint256 _amt) pure returns (uint256 amt) {
+    amt = SafeMath.mul(_amt, 10**(18 - _dec));
 }

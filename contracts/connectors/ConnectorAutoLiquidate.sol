@@ -4,7 +4,9 @@ pragma experimental ABIEncoderV2;
 
 import "../libraries/GelatoBytes.sol";
 import "../interfaces/InstaDapp/connectors/IConnectInstaPoolV2.sol";
-import { sub, add, wdiv } from "../math/DSMath.sol";
+import { sub, add } from "../math/DSMath.sol";
+import "../utils/SafeMath.sol";
+import "../utils/IERC20.sol";
 import { AccountInterface, ConnectorInterface } from "../interfaces/InstaDapp/IInstaDapp.sol";
 import { DAI, ETH, CONNECT_MAKER, CONNECT_UNISWAP, INSTA_POOL_V2 } from "../constants/CInstaDapp.sol";
 import { _getMakerVaultDebt } from "../functions/dapps/FMaker.sol";
@@ -15,12 +17,17 @@ import {
 } from "../functions/InstaDapp/connectors/FConnectMaker.sol";
 import { _encodePayGelatoProvider } from "../functions/InstaDapp/connectors/FConnectGelatoProviderPayment.sol";
 import { _getGelatoProviderFees } from "../functions/gelato/FGelato.sol";
-import { _getFlashLoanRoute, _getGasConsumedAutoLiquidation } from "../functions/gelato/FGelatoAutoLiquidation.sol";
+import {
+    _getFlashLoanRoute,
+    _getGasConsumedAutoLiquidation,
+    _convertTo18
+} from "../functions/gelato/FGelatoAutoLiquidation.sol";
 import { _encodeUniswapBuy } from "../functions/InstaDapp/connectors/FUniswap.sol";
 import { _getAmountsIn } from "../functions/dapps/FUniswap.sol";
 
 contract ConnectorAutoLiquidate is ConnectorInterface {
     using GelatoBytes for bytes;
+    using SafeMath for uint256;
 
     // solhint-disable const-name-snakecase
     string public constant override name = "ConnectorAutoLiquidate-v1.0";
@@ -116,11 +123,14 @@ contract ConnectorAutoLiquidate is ConnectorInterface {
         address[] memory _paths = new address[](2);
         _paths[0] = _colToken;
         _paths[1] = DAI;
-        uint256[] memory _amounts = _getAmountsIn(_wDaiToBorrow, _paths);
-        uint256 _askPrice = wdiv(_amounts[0], _wDaiToBorrow);
-        uint256 _askPriceWithSlippage = add(_askPrice, wdiv(_askPrice, 50)); // 2% slipagge
 
-        datas[2] = _encodeUniswapBuy(DAI, _colToken, _wDaiToBorrow, _askPriceWithSlippage, 0, 0);
+        uint256[] memory _amounts = _getAmountsIn(_wDaiToBorrow, _paths);
+        uint256 _askPrice = _amounts[0].mul(10**18).div(_wDaiToBorrow);
+        uint256 _askPriceWithSlippage = add(_askPrice, _askPrice.div(50)); // 2% slippage
+        // Connector receives unitAmount with 18 decimals
+        uint256 _unitAmt = _convertTo18(_colToken == ETH ? 18 : IERC20(_colToken).decimals(), _askPriceWithSlippage);
+
+        datas[2] = _encodeUniswapBuy(DAI, _colToken, _wDaiToBorrow, _unitAmt, 0, 0);
         datas[3] = _encodePayGelatoProvider(_colToken, _gasFeesInColToken, 0, 0);
         datas[4] = _encodeFlashPayback(DAI, _wDaiToBorrow, 0, 0);
     }
