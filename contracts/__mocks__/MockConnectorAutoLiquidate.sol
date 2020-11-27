@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 import "../utils/IERC20.sol";
 import "../libraries/GelatoBytes.sol";
 import "../interfaces/InstaDapp/connectors/IConnectInstaPoolV2.sol";
-import { sub, add } from "../math/DSMath.sol";
+import { sub, add, wdiv } from "../math/DSMath.sol";
 import "../utils/SafeMath.sol";
 import { AccountInterface, ConnectorInterface } from "../interfaces/InstaDapp/IInstaDapp.sol";
 import { DAI, ETH, CONNECT_MAKER, CONNECT_UNISWAP, INSTA_POOL_V2 } from "../constants/CInstaDapp.sol";
@@ -128,7 +128,8 @@ contract MockConnectorAutoLiquidate is ConnectorInterface {
         _paths[1] = DAI;
 
         uint256[] memory _amounts = _getAmountsIn(_wDaiToBorrow, _paths);
-        uint256 _askPrice = _amounts[0].mul(10**18).div(_wDaiToBorrow);
+        // use wdiv to equal _amounts[0].mul(10**18).div(_wDaiToBorrow);
+        uint256 _askPrice = wdiv(_amounts[0], _wDaiToBorrow);
         uint256 _askPriceWithSlippage = add(_askPrice, _askPrice.div(50)); // 2% slippage
         // Connector receives unitAmount with 18 decimals
         uint256 _unitAmt = _convertTo18(_colToken == ETH ? 18 : IERC20(_colToken).decimals(), _askPriceWithSlippage);
